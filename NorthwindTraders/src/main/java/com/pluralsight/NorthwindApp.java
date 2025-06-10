@@ -23,23 +23,36 @@ public class NorthwindApp {
 
         // create statement
         // the statement is tied to the open connection
-        Statement statement = connection.createStatement();
+        String query = """
+                         SELECT ProductId,
+                                ProductName,
+                                UnitPrice,
+                                UnitsInStock
+                         FROM Products
+                         """;
 
-        // define your query
-        String query = "SELECT * FROM products";
-        System.out.println(query);
-        // 2. Execute your query
-        ResultSet results = statement.executeQuery(query);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+
+        // 2. Execute the statement/your query
+        ResultSet results = preparedStatement.executeQuery();
+
+        System.out.printf("%-4s %-40s %15s %10s%n", "Id", "Product Name", "Unit Price", "Stock");
+        System.out.println("---------------------------------------------------------------------------");
 
         // process the results
         while (results.next()) {
-            String products = results.getString("productName");
-            System.out.println(products);
+            int productId = results.getInt("productid");
+            String productName = results.getString("productname");
+            Double unitPrice = results.getDouble("unitPrice");
+            int unitsInStock = results.getInt("unitsInStock");
+
+            System.out.printf("%-4d %-40s %15.2f %10d%n", productId, productName, unitPrice, unitsInStock);
         }
 
         // 3. Close resources
         results.close();
-        statement.close();
+        preparedStatement.close();
         connection.close();
     }
 }
